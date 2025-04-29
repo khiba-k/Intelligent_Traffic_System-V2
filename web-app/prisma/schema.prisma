@@ -1,0 +1,45 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Sensor1 {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  speed     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Sensor2 {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  speed     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Users {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  firstName     String
+  lastName      String
+  email         String          @unique
+  userId        String          @unique
+  savedSearches SavedSearches[] @relation("UserSavedSearches")
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model SavedSearches {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  startingPoint String
+  destination   String
+  userId        String
+  user          Users    @relation("UserSavedSearches", fields: [userId], references: [userId])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
