@@ -15,5 +15,13 @@ declare module "leaflet" {
     class OSRMv1 {
       constructor(options?: any);
     }
+
+    export function osrmv1(arg0: {
+      serviceUrl: string;
+      showAlternatives: boolean;
+      alternatives: boolean;
+    }) {
+      throw new Error("Function not implemented.");
+    }
   }
 }

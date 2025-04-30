@@ -1,14 +1,16 @@
-"use client"
-import TrafficPage from "@/screens/traffic/TrafficPage"
+import TrafficWrapper from "@/screens/traffic/TrafficWrapper";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-const page = () => {
-    return (
-        <div className="flex flex-col h-screen">
-            <div className="h-1/12">This is for the header</div>
-            <div className="h-10/12"><TrafficPage /></div>
-            <div className="h-1/12">This is for the footer</div>
-        </div>
-    )
+
+export default async function Page() {
+    const authData = await auth();
+    const { userId } = authData;
+
+    if (!userId) {
+        redirect("/login");
+    }
+
+    return <TrafficWrapper />;
 }
 
-export default page
