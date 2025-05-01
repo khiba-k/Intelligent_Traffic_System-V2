@@ -1,13 +1,9 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
-import type { NextFetchEvent } from "next/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export default async function middleware(
-  request: NextRequest,
-  event: NextFetchEvent
-) {
-  // Apply Clerk middleware for all matched routes
-  const clerkResponse = await clerkMiddleware()(request, event);
+// Wrap all logic inside clerkMiddleware
+const middleware = clerkMiddleware((auth, request) => {
+  const response = NextResponse.next();
 
   // Handle CORS for API routes only
   if (request.nextUrl.pathname.startsWith("/api/")) {
@@ -24,22 +20,22 @@ export default async function middleware(
       });
     }
 
-    // For non-OPTIONS API requests, add CORS headers to the Clerk response
-    if (clerkResponse instanceof NextResponse && clerkResponse.headers) {
-      clerkResponse.headers.set("Access-Control-Allow-Origin", "*");
-      clerkResponse.headers.set(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PUT, DELETE, OPTIONS"
-      );
-      clerkResponse.headers.set(
-        "Access-Control-Allow-Headers",
-        "Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version"
-      );
-    }
+    // For non-OPTIONS API requests, add CORS headers
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    response.headers.set(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    response.headers.set(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version"
+    );
   }
 
-  return clerkResponse;
-}
+  return response;
+});
+
+export default middleware;
 
 export const config = {
   matcher: ["/api/:path*", "/traffic/:path*"],
