@@ -3,6 +3,10 @@ import { NextResponse } from "next/server";
 
 // Wrap all logic inside clerkMiddleware
 const middleware = clerkMiddleware((auth, request) => {
+  // Log the request path and auth details for debugging
+  console.log("Request Path:", request.nextUrl.pathname);
+  console.log("Auth:", auth);
+
   const response = NextResponse.next();
 
   // Handle CORS for API routes only
@@ -38,5 +42,5 @@ const middleware = clerkMiddleware((auth, request) => {
 export default middleware;
 
 export const config = {
-  matcher: ["/api/:path*", "/traffic/:path*"],
+  matcher: ["/api/:path", "/traffic/:path"],
 };
