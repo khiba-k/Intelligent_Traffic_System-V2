@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json(); // Parse the JSON body
-  console.log("Body:  ", body);
 
   const { userId, stats } = body;
 

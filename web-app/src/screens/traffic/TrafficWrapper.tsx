@@ -1,28 +1,33 @@
 "use client";
+import Logo from "@/assets/TKT_logo.png";
 import { useAuth, UserButton } from "@clerk/nextjs";
-import Cookies from "js-cookie";
-import { useEffect } from "react";
+import Image from "next/image";
 import TrafficPage from "./TrafficPage";
 
 const TrafficWrapper = () => {
     const { userId, isSignedIn } = useAuth();
 
-    useEffect(() => {
-        if (isSignedIn && userId && !Cookies.get("userId")) {
-            Cookies.set("userId", userId, { path: "/", sameSite: "Lax" });
-        }
-    }, [isSignedIn, userId]);
+
 
     return (
-        <div className="flex flex-col h-screen">
-            <div className="flex justify-end h-[5%] bg-[#288066] pr-5" >
+        <div className="flex flex-col h-screen overflow-hidden">
+            <div className="flex flex-row justify-between h-[5%] bg-[#288066] pr-5">
+                <Image
+                    src={Logo}
+                    alt="Logo"
+                    className="object-cover h-10 w-10 sm:h-12 sm:w-12 ml-2"
+                    priority
+                />
                 <UserButton />
             </div>
-            <div className="h-[90%] bg-gradient-to-br from-white via-gray-400 to-white">
+
+            {/* Fill the rest */}
+            <div className="flex-1 relative bg-gradient-to-br from-white via-gray-400 to-white">
                 <TrafficPage />
             </div>
+
             <div className="h-[5%] bg-[#288066] flex justify-center items-center">
-                <p className="font-semibold text-center text-white">
+                <p className="font-semibold text-center text-white text-xs sm:text-sm">
                     Cultivating Smoother Journeys with Cutting-Edge Technology
                 </p>
             </div>

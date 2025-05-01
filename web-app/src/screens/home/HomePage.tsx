@@ -5,18 +5,22 @@ import Body from "./Body";
 
 const HomePage = () => {
     return (
-        <div className="flex flex-col h-screen border-red-200">
-            <section id="header" className="h-1/12">
+        <div className="flex flex-col h-screen">
+            <section id="header" className="h-[80px] shrink-0">
                 <Header />
             </section>
-            <section className="h-10/12 bg-gray-600" id="body">
+
+            <section id="body" className="flex-grow">
                 <Body />
             </section>
-            <section id="footer" className="bg-[#288066] h-1/12 flex justify-center items-center">
-                <p className="text-lg font-semibold" style={{ textAlign: "center", color: "white" }}>Cultivating Smoother Journeys with Cutting-Edge Technology</p>
+
+            <section id="footer" className="h-[60px] shrink-0 bg-[#288066] flex justify-center items-center">
+                <p className="text-center text-white text-sm md:text-base font-semibold">
+                    Cultivating Smoother Journeys with Cutting-Edge Technology
+                </p>
             </section>
         </div>
-    )
-}
+    );
+};
 
 export default HomePage;

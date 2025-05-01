@@ -52,7 +52,11 @@ const RoutingMachine = ({
     fromPosition: L.LatLngExpression;
     toPosition: L.LatLngExpression | null;
     isSearchMode: boolean;
-    onRouteStats?: (stats: { name: string; distance: number; duration: number }[]) => void;
+    onRouteStats?: (stats: {
+        name: string; distance: number; duration: number;
+        speed: number;
+        timeOfArrival: string;
+    }[]) => void;
 }) => {
     const map = useMap();
     const routingControlRef = useRef<any>(null);
@@ -101,7 +105,7 @@ const RoutingMachine = ({
                 const routes = e.routes;
                 if (!routes || routes.length === 0) return;
 
-                const routeSummaries: { name: string; distance: number; duration: number }[] = [];
+                const routeSummaries: { name: string; distance: number; duration: number; speed: number; timeOfArrival: string }[] = [];
 
                 routes.forEach((route: any) => {
                     const seen = new Set<string>();
@@ -140,10 +144,13 @@ const RoutingMachine = ({
                         summaryName = `${importantRoads[0]}, ${importantRoads[1]}`;
                     }
 
+                    const now = new Date();
                     routeSummaries.push({
                         name: summaryName,
                         distance: route.summary?.totalDistance || route.summary?.distance || 0,
                         duration: route.summary?.totalTime || route.summary?.duration || 0,
+                        speed: 0,
+                        timeOfArrival: new Date(now.getTime() + (route.summary?.totalTime || route.summary?.duration || 0) * 1000).toISOString(),
                     });
                 });
 
@@ -183,7 +190,7 @@ const MapComponent = ({
     origin?: string;
     destination?: string;
     isSearchMode?: boolean;
-    onRouteStats?: (stats: { name: string; distance: number; duration: number }[]) => void;
+    onRouteStats?: (stats: { name: string; distance: number; duration: number; speed: number; timeOfArrival: string }[]) => void;
 }) => {
     const [fromCoords, setFromCoords] = useState<L.LatLngExpression>(DEFAULT_POSITION);
     const [toCoords, setToCoords] = useState<L.LatLngExpression | null>(null);
@@ -199,7 +206,7 @@ const MapComponent = ({
                         setIsLoading(false);
                     },
                     (err) => {
-                        console.error("Geolocation error:", err);
+                        console.log("Geolocation error:", err);
                         setIsLoading(false);
                     },
                     { enableHighAccuracy: true }
@@ -264,15 +271,22 @@ const MapComponent = ({
     }, [origin, destination, isSearchMode]);
 
     return (
-        <div style={{ height: "50vh", width: "100%" }} className="border bor rounded-lg">
-            <MapContainer center={fromCoords} zoom={13} style={{ height: "100%", width: "100%" }}>
+        <div className="w-full h-full lg:h-[50vh] rounded-lg overflow-hidden border">
+            <MapContainer
+                center={fromCoords}
+                zoom={13}
+                style={{ height: "100%", width: "100%" }}
+            >
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution="&copy; OpenStreetMap contributors"
+
                 />
                 <RecenterMap coords={fromCoords} />
                 <Marker position={fromCoords} icon={startIcon} />
-                {isSearchMode && toCoords && <Marker position={toCoords} icon={endIcon} />}
+                {isSearchMode && toCoords && (
+                    <Marker position={toCoords} icon={endIcon} />
+                )}
                 <RoutingMachine
                     fromPosition={fromCoords}
                     toPosition={toCoords}

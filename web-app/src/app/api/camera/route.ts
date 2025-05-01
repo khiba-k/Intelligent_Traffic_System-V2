@@ -1,13 +1,11 @@
 import { prisma } from "@/lib/db/prisma";
-import updateAndCacheRouteStats from "@/lib/db/updateSpeed";
+// import updateAndCacheRouteStats from "@/lib/db/updateSpeed";
+import { redis } from "@/lib/db/redis";
 import { differenceInMilliseconds } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
   try {
-    const userId = req.cookies.get("userId")?.value || null;
-    console.log("UserId: ", userId);
-
     const { time } = await req.json();
 
     if (!time) {
@@ -40,13 +38,10 @@ export const POST = async (req: NextRequest) => {
       return currDiff < prevDiff ? curr : prev;
     });
 
-    console.log("Closest Document:", closest);
-
-    await updateAndCacheRouteStats(userId, closest.speed);
+    await redis.set(`sensor1`, JSON.stringify(closest.speed));
 
     return NextResponse.json({
       time: targetTime.toISOString(),
-      userId: userId,
       speed: closest.speed,
     });
   } catch (err) {
