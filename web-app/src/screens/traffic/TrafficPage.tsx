@@ -5,12 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { sweepRouteStats, useRouteStatsStore } from '@/lib/useRouteStatsStore';
 import { useUser } from "@clerk/nextjs";
-import { Search } from "lucide-react";
+import { BookMarkedIcon, Search } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import RouteTable from "./StatsComponent";
 import { handleRedisData, pollRedis } from "./utils/CachePoller";
+import { saveSearch } from "./utils/SaveSearches";
+
 
 // Dynamically import the MapComponent with SSR disabled
 const MapComponent = dynamic(() => import("@/screens/traffic/MapComponent"), {
@@ -108,6 +110,13 @@ const TrafficPage = () => {
         });
     };
 
+    const saveSearchInfo = {
+        userId: userId,
+        startingPoint: origin.trim(),
+        destination: destination.trim(),
+    }
+
+
     return (
         <>
             <div className="w-full h-full relative">
@@ -124,11 +133,7 @@ const TrafficPage = () => {
                 {/* For lg+ screens: Normal stacked layout */}
                 <div className="hidden lg:flex h-full flex-row px-2 pt-6 pb-6 relative z-10">
                     <div className="h-full w-[12%] p-5">
-                        <Image
-                            src={qrCode}
-                            alt="QR Code"
-                            className="object-cover"
-                        />
+
                     </div>
                     <div className="flex flex-col justify-around w-[76%]">
                         <div className="w-full flex justify-center">
@@ -151,6 +156,12 @@ const TrafficPage = () => {
                                 >
                                     <Search className="w-4 h-4" />
                                 </Button>
+                                <Button
+                                    className="w-12 flex items-center justify-center"
+                                    onClick={() => saveSearch(saveSearchInfo)}
+                                >
+                                    <BookMarkedIcon className="w-4 h-4" />
+                                </Button>
                             </div>
                         </div>
 
@@ -167,7 +178,11 @@ const TrafficPage = () => {
                             <RouteTable routeStats={routeStats} />
                         </div>
                     </div>
-                    <div className="h-full w-[12%]"></div>
+                    <div className="h-full w-[12%] p-5"><Image
+                        src={qrCode}
+                        alt="QR Code"
+                        className="object-cover"
+                    /></div>
                 </div>
 
                 {/* For sm screens: Popover-triggered input form on top of map */}

@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/db/prisma";
 // import updateAndCacheRouteStats from "@/lib/db/updateSpeed";
 import { redis } from "@/lib/db/redis";
-import { differenceInMilliseconds } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
@@ -12,37 +11,18 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: "Missing time" }, { status: 400 });
     }
 
-    const targetTime = new Date(time);
-    console.log("Target Time (UTC):", targetTime.toISOString());
-
-    const recentDocs = await prisma.sensor1.findMany({
-      take: 5,
+    const latestDoc = await prisma.sensor1.findFirst({
       orderBy: { createdAt: "desc" },
     });
 
-    if (recentDocs.length === 0) {
+    if (!latestDoc) {
       return NextResponse.json({ message: "No data found" }, { status: 404 });
     }
 
-    const closest = recentDocs.reduce((prev, curr) => {
-      const prevDiff = Math.abs(
-        differenceInMilliseconds(new Date(prev.createdAt), targetTime)
-      );
-      const currDiff = Math.abs(
-        differenceInMilliseconds(new Date(curr.createdAt), targetTime)
-      );
-
-      if (prevDiff > 5 * 60 * 1000) return curr;
-      if (currDiff > 5 * 60 * 1000) return prev;
-
-      return currDiff < prevDiff ? curr : prev;
-    });
-
-    await redis.set(`sensor1`, JSON.stringify(closest.speed));
+    await redis.set(`sensor1`, JSON.stringify(latestDoc.speed));
 
     return NextResponse.json({
-      time: targetTime.toISOString(),
-      speed: closest.speed,
+      speed: latestDoc.speed,
     });
   } catch (err) {
     console.error(err);
