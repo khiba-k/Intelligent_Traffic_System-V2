@@ -30,8 +30,6 @@ export const handleRedisData = (data: any) => {
   const speed = Number(sensorValue); // assuming km/h
   const distance = first.distance / 1000; // meters to km
 
-  if (!speed || speed === 0) return;
-
   const newDuration = (distance / speed) * 3600; // seconds
 
   const newArrivalTime = new Date(
