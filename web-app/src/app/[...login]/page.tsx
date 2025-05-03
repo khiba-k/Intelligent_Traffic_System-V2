@@ -5,7 +5,7 @@ const SignInPage = () => {
   const { isSignedIn, user } = useUser();
 
   return (
-    <div>
+    <div className="h-screen w-full flex items-center justify-center">
       <SignIn
         path="/login"
         routing="path"
