@@ -1,7 +1,5 @@
 "use client";
 import { SignIn, useUser } from "@clerk/nextjs";
-import Image from "next/image";
-import traffic1 from "@/assets/traffic1.jpg"; 
 
 const SignInPage = () => {
   const { isSignedIn, user } = useUser();
@@ -9,18 +7,19 @@ const SignInPage = () => {
 
   return (
     <div className="relative flex items-center justify-center h-screen">
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 hidden sm:block">
         <img 
           src={backgroundImage}
           alt="Traffic Image"
           className="w-full h-full object-cover" 
         />
       </div>
-      <div className="relative z-10 flex flex-col items-center justify-center bg-white bg-opacity-80 p-8 rounded-lg shadow-lg">
+      <div className="relative z-10 flex flex-col items-center justify-center shadow-lg">
         <SignIn
           path="/login"
           routing="path"
-          signUpUrl="/sign-up" />
+          signUpUrl="/sign-up"
+        />
       </div>
     </div>
   );
