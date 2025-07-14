@@ -1,0 +1,8 @@
+flask
+requests
+flask-cors
+torch
+torchvision
+torchaudio
+opencv-python
+pandas
